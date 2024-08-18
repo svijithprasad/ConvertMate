@@ -51,10 +51,12 @@ const Navbar = () => {
         </div>
       </div>
       <div className="hidden items-center justify-center gap-3 md:flex">
-        <Button variant="outline" className="flex gap-2 rounded-[4px]">
-          <GitHubLogoIcon /> GitHub
-        </Button>
-        <ModeToggle  />
+        <a href="https://github.com/svijithprasad/ConvertMate">
+          <Button variant="outline" className="flex gap-2 rounded-[4px]">
+            <GitHubLogoIcon /> GitHub
+          </Button>
+        </a>
+        <ModeToggle />
       </div>
 
       <Sheet>
@@ -94,9 +96,11 @@ const Navbar = () => {
                   About
                 </NavLink>
                 <Separator className="mt-2" />
-                <Button variant="outline" className="flex gap-2 mt-5">
-                  <GitHubLogoIcon /> GitHub
-                </Button>
+                <a href="https://github.com/svijithprasad/ConvertMate">
+                  <Button variant="outline" className="flex gap-2 mt-5">
+                    <GitHubLogoIcon /> GitHub
+                  </Button>
+                </a>
               </div>
             </SheetDescription>
           </SheetHeader>
