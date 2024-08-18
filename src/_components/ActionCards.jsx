@@ -95,7 +95,7 @@ const ActionCards = ({
             Converted
           </Badge>
         ) : action.isConverting ? ( // Use 'isConverting' instead of 'is_converting' for consistency
-          <Badge className="md:mr-10 mx-5 md:mx-0 rounded-[4px]" variant="default">
+          <Badge className="mx-5 md:mx-10 rounded-[4px]" variant="default">
             Converting...
           </Badge>
         ) : (
