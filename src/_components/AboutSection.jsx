@@ -3,7 +3,7 @@ import { ScrollArea } from "../components/ui/scroll-area";
 const AboutSection = () => {
   return (
     <ScrollArea className="w-full h-screen">
-    <div className="space-y-12 text-md md:text-lg px-[150px] py-[150px] font-medium pb-4 md:pb-8">
+    <div className="space-y-12 text-md md:text-lg md:px-[150px] md:py-[150px] px-10 py-[100px] font-medium pb-[90px] md:pb-[100px]">
       <p>
         Introducing ConvertMate, the ultimate multimedia conversion powerhouse that
         empowers you to transform images, audio files, and videos with
