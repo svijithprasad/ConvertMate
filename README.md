@@ -52,5 +52,5 @@ More formats are being added regularly!
 
 ```bash
 git clone https://github.com/svijithprasad/ConvertMate.git
-cd convert-mate
+cd ConvertMate
 npm install
