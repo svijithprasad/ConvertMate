@@ -20,7 +20,6 @@ export default function MyDropzone({ setActions }) {
         ".bmp",
         ".webp",
         ".ico",
-        ".svg",
         ".tif",
         ".tiff",
         ".raw",

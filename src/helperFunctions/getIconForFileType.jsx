@@ -1,7 +1,6 @@
 import { FileImage, FileVideo, File, FileMusic } from "lucide-react";
 
 const getIconForFileType = (file) => {
-  console.log("the file revived is", file);
   const fileType = file.file_type.split("/")[0];
   if (fileType === "image") {
     return <FileImage className="h-7 w-7 text-primary" />;

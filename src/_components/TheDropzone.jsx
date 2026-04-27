@@ -1,6 +1,7 @@
 import getIconForFileType from "../helperFunctions/getIconForFileType";
 import { Skeleton } from "../components/ui/skeleton";
 import loadFfmpeg from "../helperFunctions/load-ffmpeg";
+import convertFile from "../helperFunctions/convertFile";
 import { useEffect, useRef, useState } from "react";
 import { File, Loader, Upload } from "lucide-react";
 import { Badge } from "../components/ui/badge";
@@ -35,7 +36,6 @@ const TheDropzone = () => {
       "ico",
       "tif",
       "tiff",
-      "svg",
       "raw",
       "tga",
     ],
@@ -67,8 +67,7 @@ const TheDropzone = () => {
   const [is_converting, setIsConverting] = useState(false);
   const [is_done, setIsDone] = useState(false);
   const ffmpegRef = useRef(null);
-  const [defaultValues, setDefaultValues] = useState("video");
-  const [selected, setSelected] = useState("...");
+  const [tabDefaults, setTabDefaults] = useState({}); // Track active tab per action
   const accepted_files = {
     "image/*": [
       ".jpg",
@@ -126,6 +125,10 @@ const TheDropzone = () => {
 
     for (let action of tmp_actions) {
       try {
+        if (!ffmpegRef.current) {
+          throw new Error("FFmpeg instance not available");
+        }
+        console.log(`Converting ${action.file_name} to ${action.to}...`);
         const { url, output } = await convertFile(ffmpegRef.current, action);
         tmp_actions = tmp_actions.map((elt) =>
           elt === action
@@ -139,7 +142,13 @@ const TheDropzone = () => {
             : elt
         );
         setActions(tmp_actions);
+        toast({
+          title: "Conversion Successful",
+          description: `${action.file_name} converted to ${action.to}`,
+          duration: 3000,
+        });
       } catch (err) {
+        console.error(`Conversion failed for ${action.file_name}:`, err);
         tmp_actions = tmp_actions.map((elt) =>
           elt === action
             ? {
@@ -147,10 +156,17 @@ const TheDropzone = () => {
                 is_converted: false,
                 is_converting: false,
                 is_error: true,
+                error_message: err.message,
               }
             : elt
         );
         setActions(tmp_actions);
+        toast({
+          variant: "destructive",
+          title: "Conversion Failed",
+          description: `${action.file_name}: ${err.message}`,
+          duration: 5000,
+        });
       }
     }
     setIsDone(true);
@@ -223,9 +239,26 @@ const TheDropzone = () => {
   }, []);
 
   const load = async () => {
-    const ffmpeg_response = await loadFfmpeg();
-    ffmpegRef.current = ffmpeg_response;
-    setIsLoaded(true);
+    try {
+      console.log("Loading FFmpeg...");
+      const ffmpeg_response = await loadFfmpeg();
+      ffmpegRef.current = ffmpeg_response;
+      setIsLoaded(true);
+      toast({
+        title: "FFmpeg Loaded",
+        description: "Ready to convert files",
+        duration: 2000,
+      });
+    } catch (err) {
+      console.error("Failed to load FFmpeg:", err);
+      toast({
+        variant: "destructive",
+        title: "FFmpeg Loading Failed",
+        description: err.message || "Could not load FFmpeg. Please refresh the page.",
+        duration: 5000,
+      });
+      setIsLoaded(false);
+    }
   };
   console.log(actions);
 
@@ -243,7 +276,7 @@ const TheDropzone = () => {
             )}
             <div className="flex gap-4 items-center">
               <span className="text-2xl text-orange-600">
-                {getIconForFileType(action.file_type)}
+                {getIconForFileType(action)}
               </span>
               <div className="flex items-center gap-1 w-96">
                 <span className="text-md font-medium overflow-x-hidden">
@@ -275,15 +308,9 @@ const TheDropzone = () => {
                 <span>Convert to</span>
                 <Select
                   onValueChange={(value) => {
-                    if (extensions.audio.includes(value)) {
-                      setDefaultValues("audio");
-                    } else if (extensions.video.includes(value)) {
-                      setDefaultValues("video");
-                    }
-                    setSelected(value);
                     updateAction(action.file_name, value);
                   }}
-                  value={selected}
+                  value={action.to || ""}
                 >
                   <SelectTrigger className="w-32 outline-none focus:outline-none focus:ring-0 text-center text-muted-foreground bg-background text-md font-medium">
                     <SelectValue placeholder="..." />
@@ -301,7 +328,16 @@ const TheDropzone = () => {
                       </div>
                     )}
                     {action.file_type.includes("video") && (
-                      <Tabs defaultValue={defaultValues} className="w-full">
+                      <Tabs
+                        defaultValue={tabDefaults[action.file_name] || "video"}
+                        onValueChange={(tab) => {
+                          setTabDefaults((prev) => ({
+                            ...prev,
+                            [action.file_name]: tab,
+                          }));
+                        }}
+                        className="w-full"
+                      >
                         <TabsList className="w-full">
                           <TabsTrigger value="video" className="w-full">
                             Video

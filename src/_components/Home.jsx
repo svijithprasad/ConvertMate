@@ -9,6 +9,7 @@ import loadFfmpeg from "../helperFunctions/load-ffmpeg";
 import Spinner from "./Spinner";
 import convertFile from "../helperFunctions/convertFile";
 import Footer from "./Footer";
+import { toast } from "sonner";
 
 const Home = () => {
   const [actions, setActions] = useState([]); // Renamed from 'action' to 'actions' for clarity
@@ -92,6 +93,13 @@ const Home = () => {
         setActions(updatedActions);
         setIsSuccess(false);
         console.log(err);
+        
+        // Show user-friendly error toast
+        const errorMessage = err.message || "Conversion failed. Please try a different format.";
+        toast.error(errorMessage, {
+          duration: 6000,
+          description: `File: ${action.file_name}`,
+        });
       }
     }
 
